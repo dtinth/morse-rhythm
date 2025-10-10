@@ -1,6 +1,8 @@
 import { atom } from "nanostores";
 import { audioContext } from "./audioContext";
 import { GameAudio } from "./GameAudio";
+import { reverseMorseDB } from "./morse";
+import { toVisualization } from "./toVisualization";
 import { UpdateTracker } from "./UpdateTracker";
 
 interface LevelInfo {
@@ -22,6 +24,19 @@ export class GameController {
   audio = new GameAudio();
   updateTracker = new UpdateTracker();
   levelInfo: LevelInfo = { bpm: 136 };
+  visualization = toVisualization(`________________
+________________
+HELLO_WORLD___-
+TAP_ALONG_THE_MUSIC_AND_
+VISUAL_CUES_TO_PRODUCE_
+MORSE_CODE_SIGNALS__
+REPRODUCE_THE_TEXT_
+CORRECTLY_TO_GET_PERFECT_SCORE
+________-
+A_QUICK_BROWN_FOX_
+JUMPS_OVER_THE_LAZY_DOG__
+JACKDAWS_LOVE_MY_BIG_SPHINX_
+OF_QUARTZ`);
   timer: GameTimer = (() => {
     const getTime = () => {
       if (this.audio.startedAt == null) return 0;
@@ -90,6 +105,7 @@ export class GameController {
 }
 
 export class GameKeypad {
+  groups: TapGroup[] = [];
   currentGroup: TapGroup | null = null;
   constructor(private timer: GameTimer, private timing: GameTiming) {}
   down() {
@@ -99,10 +115,15 @@ export class GameKeypad {
         latestTap &&
         latestTap.gapAfterSeconds > this.timing.unitsToSeconds(2)
       ) {
+        this.currentGroup.finishedAt ??= this.timer.time;
         this.currentGroup = null;
       }
     }
-    this.currentGroup ??= new TapGroup();
+    this.currentGroup ??= (() => {
+      const group = new TapGroup(this.timer.time, this.timing);
+      this.groups.push(group);
+      return group;
+    })();
     this.currentGroup.down(this.timer.time);
   }
   up() {
@@ -110,12 +131,29 @@ export class GameKeypad {
   }
   tick() {
     this.currentGroup?.tick(this.timer.time);
+    if (this.currentGroup && this.currentGroup.finishedAt == null) {
+      const latestTap = this.currentGroup.taps.at(-1);
+      if (
+        latestTap &&
+        latestTap.gapAfterSeconds > this.timing.unitsToSeconds(2)
+      ) {
+        this.currentGroup.finishedAt = this.timer.time;
+      }
+    }
   }
+}
+
+interface TapGroupInterpretation {
+  morse: string;
+  char: string;
 }
 
 export class TapGroup {
   taps: Tap[] = [];
   isDown = false;
+  finishedAt: number | null = null;
+  private _cachedInterpretation: TapGroupInterpretation | null = null;
+  constructor(public startedAt: number, private timing: GameTiming) {}
   down(time: number) {
     if (this.isDown) return;
     this.isDown = true;
@@ -141,6 +179,22 @@ export class TapGroup {
     } else {
       tap.gapAfterSeconds += 1 / 60;
     }
+  }
+  get interpretation() {
+    if (this._cachedInterpretation) return this._cachedInterpretation;
+    this._cachedInterpretation = this._interpret();
+    return this._cachedInterpretation;
+  }
+  private _interpret() {
+    if (!this.finishedAt) return null;
+    const morse = this.taps
+      .map((tap) => {
+        const durationUnits = this.timing.secondsToUnits(tap.durationSeconds);
+        return durationUnits < 2 ? "." : "-";
+      })
+      .join("");
+    const char = reverseMorseDB.get(morse) || "?";
+    return { morse, char };
   }
 }
 

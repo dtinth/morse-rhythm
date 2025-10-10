@@ -1,0 +1,71 @@
+.container {
+  display: flex;
+  width: 720px;
+  height: 100vh;
+  gap: 16px;
+  padding: 16px;
+}
+
+.leftPanel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.textarea {
+  flex: 1;
+  width: 100%;
+  background-color: #144741;
+  color: #fff4d4;
+  border: 4px solid #e9c46b;
+  border-radius: 8px;
+  padding: 12px;
+  font-family: monospace;
+  font-size: 16px;
+  resize: none;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: #fff4d4;
+}
+
+.rightPanel {
+  flex: 1;
+  background-color: #144741;
+  border: 4px solid #e9c46b;
+  border-radius: 8px;
+  padding: 16px;
+  overflow: auto;
+}
+
+.preview h2 {
+  margin-top: 0;
+  color: #fff4d4;
+}
+
+.visualization {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.row {
+  display: flex;
+  gap: 0px;
+  border-top: 1px solid #e9c46b22;
+}
+.row[data-major="true"] {
+  border-top: 2px solid #e9c46b88;
+}
+
+.dot {
+  width: 12px;
+  height: 6px;
+  background-color: #144741;
+}
+
+.dot.active {
+  background-color: #e9c46b;
+}
