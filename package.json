@@ -4,14 +4,17 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --port ${PORT:-18074}",
+    "preview": "vite preview --port ${PORT:-18074}",
     "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "lint": "eslint ."
   },
   "dependencies": {
+    "@nanostores/react": "^1.0.0",
+    "nanostores": "^1.0.1",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "react-router": "^7.9.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
