@@ -59,8 +59,8 @@ To add new songs, create a new folder under `public/songs/` with the same struct
 ## Design System
 
 ### Color Scheme (src/index.css)
-- **Background**: `#144741` (dark teal/forest green)
-- **Text**: `#fff4d4` (warm off-white/cream)
-- **Links**: `#e9c46b` (golden yellow/sand)
+- **Background**: `#12140d` (dark gray/near black)
+- **Text**: `#e3e3d7` (light gray/cream)
+- **Links**: `#d7eb9b` (lime green/yellow-green)
 
-The color scheme uses a warm, earthy palette with high contrast for readability. Colors are based on the Polished Jam website: https://itch.io/jam/unpolished-jam-4
+The color scheme uses a muted, modern palette with high contrast for readability.

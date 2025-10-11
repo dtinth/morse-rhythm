@@ -25,7 +25,7 @@ export function GameDisplay(props: { controller: GameController }) {
 
       const visualization = controller.visualization;
       ctx.save();
-      ctx.fillStyle = "#2A9D8E";
+      ctx.fillStyle = "#d7eb9b";
       ctx.fillRect(0, h - 10, w, 1);
       ctx.fillRect(0, h - 1, w, 1);
       const currentUnit = controller.timing.secondsToUnits(
@@ -42,9 +42,9 @@ export function GameDisplay(props: { controller: GameController }) {
           const x = i * unitWidth;
           if (visualization[i]) {
             if (i === ~~currentUnit) {
-              ctx.fillStyle = "#2BD0BA";
+              ctx.fillStyle = "#e3e3d7";
               ctx.fillRect(x, h - 10, unitWidth + 1, 10);
-              ctx.fillStyle = "#2A9D8E";
+              ctx.fillStyle = "#d7eb9b";
             } else {
               ctx.fillRect(x, h - 10, unitWidth + 1, 10);
             }
@@ -55,7 +55,7 @@ export function GameDisplay(props: { controller: GameController }) {
         }
       }
       ctx.restore();
-      ctx.fillStyle = "#e9c46b";
+      ctx.fillStyle = "#d7eb9b";
       ctx.fillRect(w / 2 - 1, h - 10 + 1, 2, 8);
       ctx.restore();
 

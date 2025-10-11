@@ -10,6 +10,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@fontsource/tasa-orbiter": "^5.2.2",
     "@nanostores/react": "^1.0.0",
     "jest-diff": "^30.2.0",
     "memoize-one": "^6.0.0",

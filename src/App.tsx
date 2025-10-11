@@ -5,7 +5,7 @@ function App() {
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        <h1 className={styles.title}>Morse Rhythm</h1>
+        <h1 className={styles.title}>morse rhythm</h1>
         <p className={styles.tagline}>
           A rhythm game PoC inspired by morse code
         </p>
@@ -18,8 +18,6 @@ function App() {
           built by dtinth
           <br />
           made for Unpolished Jam #4
-          <br />
-          color palette from the jam website
         </p>
       </div>
     </div>

@@ -64,7 +64,7 @@ function GameView(props: { controller: GameController }) {
       <div className={styles.levelInfo}>
         <div
           style={{
-            background: "#2A9D8E33",
+            background: "#d7eb9b33",
             display: "flex",
             padding: "3px 4px",
             fontSize: 12,
@@ -139,7 +139,7 @@ function GameHeader(props: { controller: GameController }) {
   return (
     <div
       style={{
-        background: "#2A9D8E33",
+        background: "#d7eb9b33",
         display: "flex",
         padding: "3px 4px",
         fontSize: 12,

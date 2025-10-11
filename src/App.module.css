@@ -13,18 +13,19 @@
 }
 
 .title {
-  font-size: 36px;
+  font-size: 28px;
   font-weight: 700;
-  color: #fff4d4;
+  color: #e3e3d7;
   margin: 0;
   line-height: 1.1;
 }
 
 .tagline {
   font-size: 16px;
-  color: #e9c46b;
+  color: #d7eb9b;
   margin: 0;
   line-height: 1.5;
+  margin-top: -12px;
 }
 
 .buttons {
@@ -43,22 +44,22 @@
   text-decoration: none;
   border-radius: 12px;
   transition: all 0.2s ease;
-  border: 4px solid #144741;
+  border: 4px solid #12140d;
 }
 
 .playButton {
-  background-color: #e9c46b;
-  color: #144741;
+  background-color: #d7eb9b;
+  color: #12140d;
 }
 
 .playButton:hover {
-  background-color: #fff4d4;
+  background-color: #e3e3d7;
   transform: scale(1.05);
 }
 
 .jamAttribution {
   margin-top: 32px;
   font-size: 14px;
-  color: #fff4d4;
+  color: #e3e3d7;
   opacity: 0.7;
 }

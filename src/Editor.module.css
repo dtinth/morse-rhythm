@@ -15,9 +15,9 @@
 .textarea {
   flex: 1;
   width: 100%;
-  background-color: #144741;
-  color: #fff4d4;
-  border: 4px solid #e9c46b;
+  background-color: #12140d;
+  color: #e3e3d7;
+  border: 4px solid #d7eb9b;
   border-radius: 8px;
   padding: 12px;
   font-family: monospace;
@@ -27,13 +27,13 @@
 
 .textarea:focus {
   outline: none;
-  border-color: #fff4d4;
+  border-color: #e3e3d7;
 }
 
 .rightPanel {
   flex: 1;
-  background-color: #144741;
-  border: 4px solid #e9c46b;
+  background-color: #12140d;
+  border: 4px solid #d7eb9b;
   border-radius: 8px;
   padding: 16px;
   overflow: auto;
@@ -41,7 +41,7 @@
 
 .preview h2 {
   margin-top: 0;
-  color: #fff4d4;
+  color: #e3e3d7;
 }
 
 .visualization {
@@ -54,18 +54,18 @@
 .row {
   display: flex;
   gap: 0px;
-  border-top: 1px solid #e9c46b22;
+  border-top: 1px solid #d7eb9b22;
 }
 .row[data-major="true"] {
-  border-top: 2px solid #e9c46b88;
+  border-top: 2px solid #d7eb9b88;
 }
 
 .dot {
   width: 12px;
   height: 6px;
-  background-color: #144741;
+  background-color: #12140d;
 }
 
 .dot.active {
-  background-color: #e9c46b;
+  background-color: #d7eb9b;
 }

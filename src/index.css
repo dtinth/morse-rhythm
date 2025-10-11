@@ -1,10 +1,10 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: TASA Orbiter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  background-color: #144741;
-  color: #fff4d4;
+  background-color: #12140d;
+  color: #e3e3d7;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -12,9 +12,13 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+button {
+  font-family: inherit;
+}
+
 a {
   font-weight: 500;
-  color: #e9c46b;
+  color: #d7eb9b;
   text-decoration: inherit;
 }
 
