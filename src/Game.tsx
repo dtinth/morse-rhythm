@@ -45,6 +45,8 @@ export function Game() {
   return <GameView controller={controller} />;
 }
 
+type ButtonEvent = Pick<React.UIEvent, "preventDefault">;
+
 function GameView(props: { controller: GameController }) {
   const { controller } = props;
   const ready = useStore(controller.$ready);
@@ -66,15 +68,14 @@ function GameView(props: { controller: GameController }) {
   }
   return (
     <div>
-      <h1>Game</h1>
       <GameDisplay controller={controller} />
       <GameButton
         $isPressed={controller.$pressed}
-        onDown={(e: Event) => {
+        onDown={(e: ButtonEvent) => {
           e.preventDefault();
           controller.down();
         }}
-        onUp={(e: Event) => {
+        onUp={(e: ButtonEvent) => {
           e.preventDefault();
           controller.up();
         }}
@@ -85,8 +86,8 @@ function GameView(props: { controller: GameController }) {
 
 function GameButton(props: {
   $isPressed: ReadableAtom<boolean>;
-  onDown: (e: Event) => void;
-  onUp: (e: Event) => void;
+  onDown: (e: ButtonEvent) => void;
+  onUp: (e: ButtonEvent) => void;
 }) {
   const { $isPressed, onDown, onUp } = props;
   const isPressed = useStore($isPressed);

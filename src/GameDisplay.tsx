@@ -87,20 +87,24 @@ export function GameDisplay(props: { controller: GameController }) {
         const targetGapAfterUnits =
           actualGapAfterUnits > 5 ? 7 : actualGapAfterUnits > 2 ? 3 : 1;
 
-        const influence =
+        const durationInfluence =
+          1 - Math.exp(Math.min(0, releaseTime - t) * 10);
+        const gapInfluence =
           1 -
-          Math.exp(Math.min(0, releaseTime - t + timing.unitsToSeconds(5)) * 3);
+          Math.exp(
+            Math.min(0, releaseTime - t + timing.unitsToSeconds(5)) * 10
+          );
 
         return {
           durationUnits: lerp(
             actualDurationUnits,
             targetDurationUnits,
-            influence
+            durationInfluence
           ),
           gapAfterUnits: lerp(
             actualGapAfterUnits,
             targetGapAfterUnits,
-            influence
+            gapInfluence
           ),
         };
       });
@@ -114,14 +118,17 @@ export function GameDisplay(props: { controller: GameController }) {
 
       ctx.save();
 
-      const activeX = (w - groupWidth) / 2;
-      const activeY = h - 32 - groupHeight;
+      const activeX = w / 2;
+      const activeY = h - 32 - groupWidth;
       const activeScale = 1;
+      const activeRotate = Math.PI / 2;
       const timeSinceFinished =
         group.finishedAt == null ? 0 : t - group.finishedAt;
       const finishInfluence = Math.exp(-(timeSinceFinished ** 2) * 3);
       const finishedScale = 1 / 16;
+      const finishedRotate = 0;
       const scale = lerp(finishedScale, activeScale, finishInfluence);
+      const rotate = lerp(finishedRotate, activeRotate, finishInfluence);
       ctx.translate(
         lerp(targetX, activeX, finishInfluence),
         lerp(targetY, activeY, finishInfluence)
@@ -129,13 +136,17 @@ export function GameDisplay(props: { controller: GameController }) {
       ctx.scale(scale, scale);
 
       let x = 0;
+      ctx.save();
+      ctx.rotate(rotate);
       for (const tap of processed) {
         const tapWidth = tap.durationUnits * groupHeight;
-        ctx.fillRect(x, 0, tapWidth, groupHeight);
+        ctx.fillRect(x, -groupHeight / 2, tapWidth, groupHeight);
         x += tapWidth;
         const gapWidth = tap.gapAfterUnits * groupHeight;
         x += gapWidth;
       }
+      ctx.restore();
+
       if (timeSinceFinished > 0) {
         const interpretation = group.interpretation;
         if (interpretation) {
@@ -143,7 +154,11 @@ export function GameDisplay(props: { controller: GameController }) {
           ctx.save();
           ctx.globalAlpha = alpha;
           ctx.font = "bold 256px monospace";
-          ctx.fillText(interpretation.char, 0, alpha * -32);
+          ctx.fillText(
+            interpretation.char,
+            0,
+            alpha * -32 + (1 - alpha) * groupWidth
+          );
           ctx.restore();
         }
       }
@@ -158,7 +173,7 @@ export function GameDisplay(props: { controller: GameController }) {
         ref={canvasRef}
         className={styles.gameDisplay}
         width={360}
-        height={320}
+        height={360}
       />
     </div>
   );
