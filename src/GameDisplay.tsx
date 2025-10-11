@@ -61,7 +61,7 @@ export function GameDisplay(props: { controller: GameController }) {
 
       const keypad = controller.keypad;
       let groupX = 20;
-      let groupY = 20;
+      let groupY = 40;
       const groups = keypad.groups;
       for (const [index, group] of groups.entries()) {
         const nextGroup = groups[index + 1];
@@ -69,10 +69,10 @@ export function GameDisplay(props: { controller: GameController }) {
         groupX += 12;
         if (group.finishedAt != null && nextGroup) {
           const gap = nextGroup.startedAt - group.finishedAt;
-          if (gap > controller.timing.unitsToSeconds(9)) {
+          if (gap > controller.timing.unitsToSeconds(7)) {
             groupX = 20;
             groupY += 24;
-          } else if (gap > controller.timing.unitsToSeconds(5)) {
+          } else if (gap > controller.timing.unitsToSeconds(3)) {
             groupX += 12;
             if (groupX > w - 128) {
               groupX = 20 + 24;

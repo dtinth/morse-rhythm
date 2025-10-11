@@ -1,3 +1,5 @@
+import { diffStringsRaw } from "jest-diff";
+import memoizeOne from "memoize-one";
 import { atom } from "nanostores";
 import { audioContext } from "./audioContext";
 import { GameAudio } from "./GameAudio";
@@ -15,6 +17,7 @@ export class GameController {
   $ready = atom(false);
   $started = atom(false);
   $pressed = atom(false);
+  $time = atom(0);
   $frameCount = atom(0);
 
   songAudio: AudioBuffer | null = null;
@@ -37,6 +40,43 @@ export class GameController {
   })();
   timing = new GameTiming(this.levelInfo);
   keypad = new GameKeypad(this.timer, this.timing);
+  targetChars = Array.from(this.levelInfo.targetText)
+    .filter((x) => x.match(/^[A-Z]$/))
+    .join("");
+  startTime = (() => {
+    const firstUnit = this.visualization.findIndex((x) => x);
+    return this.timing.unitsToSeconds(firstUnit);
+  })();
+  get currentChars() {
+    const out: string[] = [];
+    const endTime = this.timing.unitsToSeconds(this.visualization.length);
+    for (const group of this.keypad.groups) {
+      if (group.startedAt > endTime + 1) break;
+      const interpretation = group.interpretation;
+      if (interpretation?.char) {
+        out.push(interpretation.char);
+      }
+    }
+    return out.join("");
+  }
+  private getCurrentScore = (() => {
+    const computeScore = memoizeOne((current: string, target: string) => {
+      const diff = diffStringsRaw(target, current, false);
+      let total = 0;
+      let common = 0;
+      for (const item of diff) {
+        if (item[0] === 0) {
+          total += item[1].length;
+          common += item[1].length;
+        } else {
+          total += item[1].length;
+        }
+      }
+      return { scoreFraction: common / total, common, total };
+    });
+    return () => computeScore(this.currentChars, this.targetChars);
+  })();
+  $score = atom(this.getCurrentScore());
 
   async init() {
     await this.loadSound();
@@ -72,6 +112,8 @@ export class GameController {
       this.update();
     });
     this.$frameCount.set(this.$frameCount.get() + 1);
+    this.$time.set(this.timer.time);
+    this.$score.set(this.getCurrentScore());
     this.animationFrameId = requestAnimationFrame(this.frame.bind(this));
   }
   update() {
@@ -81,12 +123,14 @@ export class GameController {
     if (this.$pressed.get()) return;
     this.$pressed.set(true);
     this.audio.down();
+    if (this.timer.time < this.startTime - 1) return;
     this.keypad.down();
   }
   up() {
     if (!this.$pressed.get()) return;
     this.$pressed.set(false);
     this.audio.up();
+    if (this.timer.time < this.startTime - 1) return;
     this.keypad.up();
   }
   dispose() {
