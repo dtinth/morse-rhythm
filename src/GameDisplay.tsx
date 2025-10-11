@@ -27,7 +27,7 @@ export function GameDisplay(props: { controller: GameController }) {
       const visualization = controller.visualization;
       ctx.save();
       ctx.fillStyle = "#d7eb9b";
-      ctx.fillRect(0, h - 10, w, 1);
+      ctx.fillRect(0, h - 12 - 1, w, 1);
       ctx.fillRect(0, h - 1, w, 1);
       const currentUnit = controller.timing.secondsToUnits(
         controller.timer.time
@@ -44,20 +44,20 @@ export function GameDisplay(props: { controller: GameController }) {
           if (visualization[i]) {
             if (i === ~~currentUnit) {
               ctx.fillStyle = "#fff";
-              ctx.fillRect(x, h - 10, unitWidth + 1, 10);
+              ctx.fillRect(x, h - 11, unitWidth + 1, unitWidth + 1);
               ctx.fillStyle = "#d7eb9b";
             } else {
-              ctx.fillRect(x, h - 10, unitWidth + 1, 10);
+              ctx.fillRect(x, h - 11, unitWidth + 1, unitWidth + 1);
             }
             if (visualization[i] !== " ") {
-              ctx.fillText(visualization[i], x, h - 12);
+              ctx.fillText(visualization[i], x, h - 15);
             }
           }
         }
       }
       ctx.restore();
       ctx.fillStyle = "#d7eb9b";
-      ctx.fillRect(w / 2 - 1, h - 10 + 1, 2, 8);
+      ctx.fillRect(w / 2 - 1, h - 12, 2, 12);
       ctx.restore();
 
       const keypad = controller.keypad;
@@ -76,7 +76,7 @@ export function GameDisplay(props: { controller: GameController }) {
             groupY += 24;
           } else if (gap > controller.timing.unitsToSeconds(3)) {
             groupX += 12;
-            if (groupX > w - 128) {
+            if (groupX > w - 64) {
               groupX = 20 + 24;
               groupY += 24;
             }

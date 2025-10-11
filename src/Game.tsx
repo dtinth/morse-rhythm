@@ -93,13 +93,15 @@ function GameView(props: { controller: GameController }) {
             </a>
           </p>
         </div>
-        <button
-          onClick={() => controller.start()}
-          className={styles.readyButton}
-          disabled={!ready}
-        >
-          {ready ? "Ready" : "Loading"}
-        </button>
+        <div>
+          <button
+            onClick={() => controller.start()}
+            className={styles.readyButton}
+            disabled={!ready}
+          >
+            {ready ? "Ready" : "Loading"}
+          </button>
+        </div>
         <p className={styles.credits}>{info.additionalCredits}</p>
         <div className={styles.audioNote}>
           <p>
