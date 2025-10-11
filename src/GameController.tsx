@@ -19,6 +19,7 @@ export class GameController {
   $pressed = atom(false);
   $time = atom(0);
   $frameCount = atom(0);
+  $hardMode = atom(false);
 
   songAudio: AudioBuffer | null = null;
   keyAudio: AudioBuffer | null = null;

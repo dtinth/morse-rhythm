@@ -58,6 +58,7 @@ function GameView(props: { controller: GameController }) {
   const { controller } = props;
   const ready = useStore(controller.$ready);
   const started = useStore(controller.$started);
+  const hardMode = useStore(controller.$hardMode);
   if (!started) {
     const info = controller.levelInfo;
     return (
@@ -101,6 +102,17 @@ function GameView(props: { controller: GameController }) {
           >
             {ready ? "Ready" : "Loading"}
           </button>
+          <div className={styles.hardModeToggle}>
+            <label>
+              <input
+                type="checkbox"
+                title="The visual cue will only show the character, not the morse code."
+                checked={hardMode}
+                onChange={(e) => controller.$hardMode.set(e.target.checked)}
+              />
+              <span>Hard mode</span>
+            </label>
+          </div>
         </div>
         <p className={styles.credits}>{info.additionalCredits}</p>
         <div className={styles.audioNote}>

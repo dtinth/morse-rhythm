@@ -37,17 +37,20 @@ export function GameDisplay(props: { controller: GameController }) {
       {
         const begin = ~~(currentUnit - 40);
         const end = ~~(currentUnit + 40);
+        const hardMode = controller.$hardMode.get();
         const unitWidth = 8;
         ctx.translate(w / 2 - currentUnit * unitWidth, 0);
         for (let i = begin; i <= end; i++) {
           const x = i * unitWidth;
           if (visualization[i]) {
-            if (i === ~~currentUnit) {
-              ctx.fillStyle = "#fff";
-              ctx.fillRect(x, h - 11, unitWidth + 1, unitWidth + 1);
-              ctx.fillStyle = "#d7eb9b";
-            } else {
-              ctx.fillRect(x, h - 11, unitWidth + 1, unitWidth + 1);
+            if (!hardMode) {
+              if (i === ~~currentUnit) {
+                ctx.fillStyle = "#fff";
+                ctx.fillRect(x, h - 11, unitWidth + 1, unitWidth + 1);
+                ctx.fillStyle = "#d7eb9b";
+              } else {
+                ctx.fillRect(x, h - 11, unitWidth + 1, unitWidth + 1);
+              }
             }
             if (visualization[i] !== " ") {
               ctx.fillText(visualization[i], x, h - 15);
