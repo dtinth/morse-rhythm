@@ -105,7 +105,7 @@
 
 .gameButton:active,
 .gameButton.pressed {
-  background-color: #e3e3d7;
+  background-color: #d7eb9bcc;
 }
 
 .hint {

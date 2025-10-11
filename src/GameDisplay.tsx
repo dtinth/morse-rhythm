@@ -14,6 +14,7 @@ export function GameDisplay(props: { controller: GameController }) {
     const w = canvas.width;
     const h = canvas.height;
     const debug = false;
+    let currentScrollDown = 0;
 
     const redraw = (frameCount: number) => {
       ctx.clearRect(0, 0, w, h);
@@ -42,7 +43,7 @@ export function GameDisplay(props: { controller: GameController }) {
           const x = i * unitWidth;
           if (visualization[i]) {
             if (i === ~~currentUnit) {
-              ctx.fillStyle = "#e3e3d7";
+              ctx.fillStyle = "#fff";
               ctx.fillRect(x, h - 10, unitWidth + 1, 10);
               ctx.fillStyle = "#d7eb9b";
             } else {
@@ -63,9 +64,10 @@ export function GameDisplay(props: { controller: GameController }) {
       let groupX = 20;
       let groupY = 40;
       const groups = keypad.groups;
+      const positions: { x: number; y: number }[] = [];
       for (const [index, group] of groups.entries()) {
         const nextGroup = groups[index + 1];
-        drawGroup(group, groupX, groupY);
+        positions.push({ x: groupX, y: groupY });
         groupX += 12;
         if (group.finishedAt != null && nextGroup) {
           const gap = nextGroup.startedAt - group.finishedAt;
@@ -80,6 +82,15 @@ export function GameDisplay(props: { controller: GameController }) {
             }
           }
         }
+      }
+      let scrollDown = 0;
+      if (groupY > h - 64) {
+        scrollDown = groupY - (h - 64);
+      }
+      currentScrollDown += (scrollDown - currentScrollDown) * 0.05;
+      for (const [index, group] of groups.entries()) {
+        const { x: groupX, y: groupY } = positions[index];
+        drawGroup(group, groupX, groupY - currentScrollDown);
       }
     };
 
