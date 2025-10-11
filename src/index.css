@@ -25,3 +25,10 @@ body {
   min-width: 375px;
   min-height: 100vh;
 }
+
+#root {
+  max-width: 360px;
+  margin: 0 auto;
+  padding: 0;
+  text-align: center;
+}

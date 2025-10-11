@@ -46,4 +46,7 @@ export class GameAudio {
   up() {
     this.keyGainNode.gain.setTargetAtTime(0, audioContext.currentTime, 0.01);
   }
+  dispose() {
+    this.gainNode.disconnect();
+  }
 }

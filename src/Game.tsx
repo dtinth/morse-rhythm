@@ -8,10 +8,15 @@ import { GameDisplay } from "./GameDisplay";
 export function Game() {
   const [controller] = useState(() => new GameController());
   useEffect(() => {
+    let initialized = false;
     const timeout = setTimeout(() => {
+      initialized = true;
       controller.init();
     });
-    return () => clearTimeout(timeout);
+    return () => {
+      clearTimeout(timeout);
+      if (initialized) controller.dispose();
+    };
   }, [controller]);
 
   const started = useStore(controller.$started);
@@ -51,18 +56,33 @@ function GameView(props: { controller: GameController }) {
   const { controller } = props;
   const ready = useStore(controller.$ready);
   const started = useStore(controller.$started);
-  if (!ready) {
-    return <div>Loading assets...</div>;
-  }
   if (!started) {
+    const info = controller.levelInfo;
     return (
-      <div>
+      <div className={styles.levelInfo}>
+        <div className={styles.metadata}>
+          <h1>{info.songName}</h1>
+          <p className={styles.artist}>by {info.artist}</p>
+          <p>
+            {info.licenseInfo}
+            <br />
+            <a
+              href={info.attributionUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {info.attributionUrl}
+            </a>
+          </p>
+        </div>
         <button
           onClick={() => controller.start()}
           className={styles.readyButton}
+          disabled={!ready}
         >
-          Ready
+          {ready ? "Ready" : "Loading"}
         </button>
+        <p className={styles.credits}>{info.additionalCredits}</p>
       </div>
     );
   }
@@ -101,7 +121,7 @@ function GameButton(props: {
       onTouchStart={onDown}
       onTouchEnd={onUp}
     >
-      Beep
+      Tap
     </button>
   );
 }

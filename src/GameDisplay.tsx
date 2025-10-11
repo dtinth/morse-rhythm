@@ -32,6 +32,7 @@ export function GameDisplay(props: { controller: GameController }) {
         controller.timer.time
       );
       ctx.save();
+      ctx.font = "20px sans-serif";
       {
         const begin = ~~(currentUnit - 40);
         const end = ~~(currentUnit + 40);
@@ -40,7 +41,16 @@ export function GameDisplay(props: { controller: GameController }) {
         for (let i = begin; i <= end; i++) {
           const x = i * unitWidth;
           if (visualization[i]) {
-            ctx.fillRect(x, h - 10, unitWidth + 1, 10);
+            if (i === ~~currentUnit) {
+              ctx.fillStyle = "#2BD0BA";
+              ctx.fillRect(x, h - 10, unitWidth + 1, 10);
+              ctx.fillStyle = "#2A9D8E";
+            } else {
+              ctx.fillRect(x, h - 10, unitWidth + 1, 10);
+            }
+            if (visualization[i] !== " ") {
+              ctx.fillText(visualization[i], x, h - 12);
+            }
           }
         }
       }

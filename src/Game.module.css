@@ -1,7 +1,49 @@
+.levelInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  max-width: 360px;
+  text-align: center;
+}
+
+.levelInfo h1 {
+  margin: 0;
+  font-size: 32px;
+  color: #fff4d4;
+}
+
+.artist {
+  margin: 0;
+  font-size: 20px;
+  color: #e9c46b;
+  font-weight: 500;
+}
+
+.metadata {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #fff4d4;
+}
+
+.metadata p {
+  margin: 8px 0;
+}
+
+.metadata a {
+  color: #e9c46b;
+  word-break: break-all;
+}
+
+.credits {
+  font-style: italic;
+  opacity: 0.8;
+  font-size: 14px;
+}
+
 .readyButton {
-  width: 360px;
-  height: 360px;
-  font-size: 48px;
+  font-size: 24px;
+  padding: 20px 48px;
   font-weight: 600;
   cursor: pointer;
   background-color: #e9c46b;
@@ -11,9 +53,14 @@
   transition: all 0.2s ease;
 }
 
-.readyButton:hover {
+.readyButton:hover:not(:disabled) {
   background-color: #fff4d4;
   transform: scale(1.05);
+}
+
+.readyButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .gameButton {

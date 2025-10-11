@@ -1,13 +1,11 @@
 import { atom } from "nanostores";
 import { audioContext } from "./audioContext";
 import { GameAudio } from "./GameAudio";
+import type { LevelInfo } from "./LevelInfo";
+import { forgottenland } from "./levels";
 import { reverseMorseDB } from "./morse";
 import { toVisualization } from "./toVisualization";
 import { UpdateTracker } from "./UpdateTracker";
-
-interface LevelInfo {
-  bpm: number;
-}
 
 interface GameTimer {
   time: number;
@@ -23,20 +21,9 @@ export class GameController {
   keyAudio: AudioBuffer | null = null;
   audio = new GameAudio();
   updateTracker = new UpdateTracker();
-  levelInfo: LevelInfo = { bpm: 136 };
-  visualization = toVisualization(`________________
-________________
-HELLO_WORLD___-
-TAP_ALONG_THE_MUSIC_AND_
-VISUAL_CUES_TO_PRODUCE_
-MORSE_CODE_SIGNALS__
-REPRODUCE_THE_TEXT_
-CORRECTLY_TO_GET_PERFECT_SCORE
-________-
-A_QUICK_BROWN_FOX_
-JUMPS_OVER_THE_LAZY_DOG__
-JACKDAWS_LOVE_MY_BIG_SPHINX_
-OF_QUARTZ`);
+  levelInfo: LevelInfo = forgottenland;
+  private animationFrameId: number | null = null;
+  visualization = toVisualization(this.levelInfo.targetText);
   timer: GameTimer = (() => {
     const getTime = () => {
       if (this.audio.startedAt == null) return 0;
@@ -56,8 +43,8 @@ OF_QUARTZ`);
   }
   async loadSound() {
     const [song, key] = await Promise.all([
-      this.loadAudioBuffer("/songs/tutorial/song.ogg"),
-      this.loadAudioBuffer("/songs/tutorial/key.ogg"),
+      this.loadAudioBuffer(this.levelInfo.songUrl),
+      this.loadAudioBuffer(this.levelInfo.keyUrl),
     ]);
     this.songAudio = song;
     this.keyAudio = key;
@@ -85,7 +72,7 @@ OF_QUARTZ`);
       this.update();
     });
     this.$frameCount.set(this.$frameCount.get() + 1);
-    requestAnimationFrame(this.frame.bind(this));
+    this.animationFrameId = requestAnimationFrame(this.frame.bind(this));
   }
   update() {
     this.keypad.tick();
@@ -101,6 +88,13 @@ OF_QUARTZ`);
     this.$pressed.set(false);
     this.audio.up();
     this.keypad.up();
+  }
+  dispose() {
+    if (this.animationFrameId !== null) {
+      cancelAnimationFrame(this.animationFrameId);
+      this.animationFrameId = null;
+    }
+    this.audio.dispose();
   }
 }
 
