@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite --port ${PORT:-18074}",
     "preview": "vite preview --port ${PORT:-18074}",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && rm -f dist.zip && zip -r dist.zip dist",
     "lint": "eslint ."
   },
   "dependencies": {
