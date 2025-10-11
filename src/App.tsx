@@ -17,7 +17,7 @@ function App() {
         <p className={styles.jamAttribution}>
           built by dtinth
           <br />
-          made for Unpolished Jam #4
+          submitted to Unpolished Jam #4
         </p>
       </div>
     </div>
