@@ -70,8 +70,14 @@ function GameView(props: { controller: GameController }) {
       <GameDisplay controller={controller} />
       <GameButton
         $isPressed={controller.$pressed}
-        onDown={() => controller.down()}
-        onUp={() => controller.up()}
+        onDown={(e: Event) => {
+          e.preventDefault();
+          controller.down();
+        }}
+        onUp={(e: Event) => {
+          e.preventDefault();
+          controller.up();
+        }}
       />
     </div>
   );
@@ -79,8 +85,8 @@ function GameView(props: { controller: GameController }) {
 
 function GameButton(props: {
   $isPressed: ReadableAtom<boolean>;
-  onDown: () => void;
-  onUp: () => void;
+  onDown: (e: Event) => void;
+  onUp: (e: Event) => void;
 }) {
   const { $isPressed, onDown, onUp } = props;
   const isPressed = useStore($isPressed);
