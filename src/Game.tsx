@@ -1,13 +1,19 @@
 import { useStore } from "@nanostores/react";
 import type { ReadableAtom } from "nanostores";
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import styles from "./Game.module.css";
 import { GameController } from "./GameController";
 import { GameDisplay } from "./GameDisplay";
 
 export function Game() {
-  const [controller] = useState(() => new GameController());
+  const [params] = useSearchParams();
+  const level = params.get("level") || "forgottenland";
+  return <GameMain level={level} key={level} />;
+}
+
+export function GameMain({ level }: { level: string }) {
+  const [controller] = useState(() => new GameController(level));
   useEffect(() => {
     let initialized = false;
     const timeout = setTimeout(() => {
@@ -31,12 +37,28 @@ export function Game() {
         e.preventDefault();
         controller.down();
       }
+      if (e.code === "ArrowLeft" && !e.repeat) {
+        e.preventDefault();
+        controller.auto(".", true);
+      }
+      if (e.code === "ArrowRight" && !e.repeat) {
+        e.preventDefault();
+        controller.auto("-", true);
+      }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
       if (e.code === "Space") {
         e.preventDefault();
         controller.up();
+      }
+      if (e.code === "ArrowLeft") {
+        e.preventDefault();
+        controller.auto(".", false);
+      }
+      if (e.code === "ArrowRight") {
+        e.preventDefault();
+        controller.auto("-", false);
       }
     };
 
@@ -150,6 +172,7 @@ function GameView(props: { controller: GameController }) {
 function GameHeader(props: { controller: GameController }) {
   const { controller } = props;
   const score = useStore(controller.$score);
+  const finished = useStore(controller.$finished);
   return (
     <div
       style={{
@@ -163,7 +186,21 @@ function GameHeader(props: { controller: GameController }) {
       <div style={{ flex: "1", fontWeight: "bold" }}>
         {controller.levelInfo.songName}
       </div>
-      <div style={{ flex: "none", textAlign: "right" }}>
+      <div
+        style={{
+          flex: "none",
+          textAlign: "right",
+          transformOrigin: "top right",
+          transition: "transform 0.64s ease",
+          ...(finished
+            ? {
+                fontWeight: "bold",
+                color: "#d7eb9b",
+                transform: "translateY(24px) scale(2)",
+              }
+            : {}),
+        }}
+      >
         score: {(score.scoreFraction * 100).toFixed(1)}%
       </div>
     </div>
