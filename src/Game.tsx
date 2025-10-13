@@ -96,8 +96,8 @@ function GameView(props: { controller: GameController }) {
           }}
         >
           <div style={{ flex: "1", fontWeight: "bold" }}>
-            <Link to="/" className={styles.backLink}>
-              ← Back to menu
+            <Link to="/levels" className={styles.backLink}>
+              ← Back to levels
             </Link>
           </div>
         </div>

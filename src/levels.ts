@@ -4,6 +4,7 @@ export const forgottenland: LevelInfo = {
   bpm: 136,
   songName: "forgottenland",
   artist: "airtone",
+  description: "A slow dreamy song to introduce you to the game",
   licenseInfo:
     "Licensed under Creative Commons Attribution Noncommercial (3.0)",
   attributionUrl: "https://ccmixter.org/files/airtone/61959",
@@ -29,6 +30,7 @@ export const intergalacticBliss: LevelInfo = {
   bpm: 256,
   songName: "Intergalactic Bliss (Trance Mix)",
   artist: "KCentric",
+  description: "A fast-paced trance song to help you practice the alphabet",
   licenseInfo:
     "Licensed under Creative Commons Attribution Noncommercial (3.0)",
   attributionUrl: "https://ccmixter.org/files/kcentric/48165",

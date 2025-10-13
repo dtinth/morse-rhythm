@@ -1,0 +1,75 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  background: #12140d;
+  color: #e3e3d7;
+}
+
+.content {
+  margin: 0 auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #e3e3d7;
+}
+
+.levelList {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.levelCard {
+  background: #1a1c15;
+  border: 2px solid #2a2c25;
+  border-radius: 8px;
+  padding: 1.5rem;
+  text-decoration: none;
+  color: #e3e3d7;
+  transition: all 0.2s ease;
+}
+
+.levelCard:hover {
+  border-color: #d7eb9b;
+  background: #202218;
+  transform: translateY(-2px);
+}
+
+.levelName {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 0.125rem 0;
+  color: #d7eb9b;
+}
+
+.levelArtist {
+  font-size: 1rem;
+  margin: 0 0 0.5rem 0;
+  color: #b3b3a7;
+}
+
+.levelDescription {
+  font-size: 0.875rem;
+  text-wrap: balance;
+  margin: 0;
+  color: #8a8a7f;
+}
+
+.backLink {
+  color: #d7eb9b;
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.backLink:hover {
+  opacity: 0.8;
+}
