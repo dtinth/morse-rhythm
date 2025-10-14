@@ -42,8 +42,8 @@ export class GameController {
   endTime: number;
   $score: WritableAtom<ScoreInfo>;
 
-  autoDit = false;
-  autoDah = false;
+  $autoDit = atom(false);
+  $autoDah = atom(false);
 
   constructor(private levelName: string) {
     this.levelInfo = levels.get(this.levelName) || forgottenland;
@@ -173,9 +173,9 @@ export class GameController {
   }
   auto(signal: "." | "-", pressed: boolean) {
     if (signal === ".") {
-      this.autoDit = pressed;
+      this.$autoDit.set(pressed);
     } else {
-      this.autoDah = pressed;
+      this.$autoDah.set(pressed);
     }
   }
   autoKeyer = new AutoKeyer(
@@ -184,8 +184,8 @@ export class GameController {
   );
   executeAuto() {
     this.autoKeyer.execute(
-      this.autoDit,
-      this.autoDah,
+      this.$autoDit.get(),
+      this.$autoDah.get(),
       this.timing.secondsToUnits(this.timer.time)
     );
   }

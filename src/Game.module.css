@@ -116,15 +116,21 @@
   accent-color: #d7eb9b;
 }
 
-.gameButton {
+.gameButtons {
+  display: flex;
+  gap: 8px;
   width: 360px;
+}
+
+.gameButton {
+  flex: 1 1 0;
   height: 180px;
   font-size: 24px;
   font-weight: 600;
   cursor: pointer;
   background-color: #d7eb9b;
   color: #12140d;
-  border: 4px solid #12140d;
+  border: 0;
   border-radius: 16px;
 }
 

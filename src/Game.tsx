@@ -1,6 +1,6 @@
 import { useStore } from "@nanostores/react";
 import type { ReadableAtom } from "nanostores";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import styles from "./Game.module.css";
 import { GameController } from "./GameController";
@@ -154,17 +154,26 @@ function GameView(props: { controller: GameController }) {
         <GameDisplay controller={controller} />
         <GameHint controller={controller} />
       </div>
-      <GameButton
-        $isPressed={controller.$pressed}
-        onDown={(e: ButtonEvent) => {
-          e.preventDefault();
-          controller.down();
-        }}
-        onUp={(e: ButtonEvent) => {
-          e.preventDefault();
-          controller.up();
-        }}
-      />
+      <div className={styles.gameButtons}>
+        <GameButton
+          $isPressed={controller.$autoDit}
+          onDown={() => controller.auto(".", true)}
+          onUp={() => controller.auto(".", false)}
+          text="·"
+        />
+        <GameButton
+          $isPressed={controller.$pressed}
+          onDown={() => controller.down()}
+          onUp={() => controller.up()}
+          text="TAP"
+        />
+        <GameButton
+          $isPressed={controller.$autoDah}
+          onDown={() => controller.auto("-", true)}
+          onUp={() => controller.auto("-", false)}
+          text="—"
+        />
+      </div>
     </div>
   );
 }
@@ -243,22 +252,39 @@ function GameHint(props: { controller: GameController }) {
 
 function GameButton(props: {
   $isPressed: ReadableAtom<boolean>;
-  onDown: (e: ButtonEvent) => void;
-  onUp: (e: ButtonEvent) => void;
+  onDown: () => void;
+  onUp: () => void;
+  text: string;
 }) {
   const { $isPressed, onDown, onUp } = props;
   const isPressed = useStore($isPressed);
 
+  const handleDown = useCallback(
+    (e: ButtonEvent) => {
+      e.preventDefault();
+      onDown();
+    },
+    [onDown]
+  );
+
+  const handleUp = useCallback(
+    (e: ButtonEvent) => {
+      e.preventDefault();
+      onUp();
+    },
+    [onUp]
+  );
+
   return (
     <button
       className={`${styles.gameButton} ${isPressed ? styles.pressed : ""}`}
-      onMouseDown={onDown}
-      onMouseUp={onUp}
-      onMouseLeave={onUp}
-      onTouchStart={onDown}
-      onTouchEnd={onUp}
+      onMouseDown={handleDown}
+      onMouseUp={handleUp}
+      onMouseLeave={handleUp}
+      onTouchStart={handleDown}
+      onTouchEnd={handleUp}
     >
-      Tap
+      {props.text}
     </button>
   );
 }
