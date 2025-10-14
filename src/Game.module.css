@@ -91,40 +91,50 @@
   cursor: not-allowed;
 }
 
-.hardModeToggle {
+.options {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   margin-top: 4px;
+}
+
+.option {
   opacity: 0.5;
 }
-
-.hardModeToggle:has(input:checked) {
+.option:has(input:checked) {
   opacity: 1;
 }
-
-.hardModeToggle label {
+.option label {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   cursor: pointer;
   font-size: 16px;
 }
-
-.hardModeToggle input[type="checkbox"] {
-  width: 20px;
-  height: 20px;
+.option input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
   cursor: pointer;
   accent-color: #d7eb9b;
 }
 
-.gameButtons {
+.gameButtonRows {
   display: flex;
   gap: 8px;
   width: 360px;
+  height: 180px;
+  flex-direction: column;
+}
+
+.gameButtonRow {
+  display: flex;
+  gap: 8px;
+  flex: 1;
 }
 
 .gameButton {
-  flex: 1 1 0;
-  height: 180px;
+  flex: 1 0 0;
   font-size: 24px;
   font-weight: 600;
   cursor: pointer;
@@ -134,9 +144,14 @@
   border-radius: 16px;
 }
 
+.gameButton.secondary {
+  background-color: #3d4c0d;
+  color: #d7eb9b;
+}
+
 .gameButton:active,
 .gameButton.pressed {
-  background-color: #d7eb9bcc;
+  opacity: 0.75;
 }
 
 .hint {

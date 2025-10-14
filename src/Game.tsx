@@ -1,6 +1,6 @@
 import { useStore } from "@nanostores/react";
 import type { ReadableAtom } from "nanostores";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router";
 import styles from "./Game.module.css";
 import { GameController } from "./GameController";
@@ -81,6 +81,8 @@ function GameView(props: { controller: GameController }) {
   const ready = useStore(controller.$ready);
   const started = useStore(controller.$started);
   const hardMode = useStore(controller.$hardMode);
+  const iambic = useStore(controller.$iambic);
+
   if (!started) {
     const info = controller.levelInfo;
     return (
@@ -124,16 +126,29 @@ function GameView(props: { controller: GameController }) {
           >
             {ready ? "Ready" : "Loading"}
           </button>
-          <div className={styles.hardModeToggle}>
-            <label>
-              <input
-                type="checkbox"
-                title="The visual cue will only show the character, not the morse code."
-                checked={hardMode}
-                onChange={(e) => controller.$hardMode.set(e.target.checked)}
-              />
-              <span>Hard mode</span>
-            </label>
+          <div className={styles.options}>
+            <div className={styles.option}>
+              <label>
+                <input
+                  type="checkbox"
+                  title="The visual cue will only show the character, not the morse code."
+                  checked={hardMode}
+                  onChange={(e) => controller.$hardMode.set(e.target.checked)}
+                />
+                <span>Hard mode</span>
+              </label>
+            </div>
+            <div className={styles.option}>
+              <label>
+                <input
+                  type="checkbox"
+                  title="Use a double-paddle keyer instead of a straight key."
+                  checked={iambic}
+                  onChange={(e) => controller.$iambic.set(e.target.checked)}
+                />
+                <span>Iambic</span>
+              </label>
+            </div>
           </div>
         </div>
         <p className={styles.credits}>{info.additionalCredits}</p>
@@ -154,25 +169,33 @@ function GameView(props: { controller: GameController }) {
         <GameDisplay controller={controller} />
         <GameHint controller={controller} />
       </div>
-      <div className={styles.gameButtons}>
-        <GameButton
-          $isPressed={controller.$autoDit}
-          onDown={() => controller.auto(".", true)}
-          onUp={() => controller.auto(".", false)}
-          text="·"
-        />
-        <GameButton
-          $isPressed={controller.$pressed}
-          onDown={() => controller.down()}
-          onUp={() => controller.up()}
-          text="TAP"
-        />
-        <GameButton
-          $isPressed={controller.$autoDah}
-          onDown={() => controller.auto("-", true)}
-          onUp={() => controller.auto("-", false)}
-          text="—"
-        />
+      <div className={styles.gameButtonRows}>
+        <div className={styles.gameButtonRow}>
+          <GameButton
+            $isPressed={controller.$pressed}
+            onDown={() => controller.down()}
+            onUp={() => controller.up()}
+            text="TAP"
+          />
+        </div>
+        {iambic ? (
+          <div className={styles.gameButtonRow} style={{ flex: "2 0 0" }}>
+            <GameButton
+              $isPressed={controller.$autoDit}
+              onDown={() => controller.auto(".", true)}
+              onUp={() => controller.auto(".", false)}
+              text="·"
+              secondary
+            />
+            <GameButton
+              $isPressed={controller.$autoDah}
+              onDown={() => controller.auto("-", true)}
+              onUp={() => controller.auto("-", false)}
+              text="—"
+              secondary
+            />
+          </div>
+        ) : null}
       </div>
     </div>
   );
@@ -255,6 +278,7 @@ function GameButton(props: {
   onDown: () => void;
   onUp: () => void;
   text: string;
+  secondary?: boolean;
 }) {
   const { $isPressed, onDown, onUp } = props;
   const isPressed = useStore($isPressed);
@@ -275,14 +299,35 @@ function GameButton(props: {
     [onUp]
   );
 
+  const handleMove = useCallback((e: React.TouchEvent) => {
+    e.preventDefault();
+  }, []);
+
+  const btnRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    const btn = btnRef.current;
+    if (!btn) return;
+    const cancel = (e: Event) => {
+      e.preventDefault();
+    };
+    btn.addEventListener("touchstart", cancel, { passive: false });
+    return () => btn.removeEventListener("touchstart", cancel);
+  }, []);
+
   return (
     <button
-      className={`${styles.gameButton} ${isPressed ? styles.pressed : ""}`}
+      className={[
+        styles.gameButton,
+        isPressed ? styles.pressed : "",
+        props.secondary ? styles.secondary : "",
+      ].join(" ")}
       onMouseDown={handleDown}
       onMouseUp={handleUp}
       onMouseLeave={handleUp}
       onTouchStart={handleDown}
+      onTouchMove={handleMove}
       onTouchEnd={handleUp}
+      ref={btnRef}
     >
       {props.text}
     </button>

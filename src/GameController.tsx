@@ -26,7 +26,8 @@ export class GameController {
   $pressed = atom(false);
   $time = atom(0);
   $frameCount = atom(0);
-  $hardMode = atom(false);
+  $hardMode = atom(localStorage.getItem("morse-rhythm-hardmode") === "1");
+  $iambic = atom(localStorage.getItem("morse-rhythm-iambic") === "1");
 
   songAudio: AudioBuffer | null = null;
   keyAudio: AudioBuffer | null = null;
@@ -59,6 +60,13 @@ export class GameController {
     })();
     this.endTime = this.timing.unitsToSeconds(this.visualization.length);
     this.$score = atom(this.getCurrentScore());
+
+    this.$iambic.listen((value) => {
+      localStorage.setItem("morse-rhythm-iambic", value ? "1" : "0");
+    });
+    this.$hardMode.listen((value) => {
+      localStorage.setItem("morse-rhythm-hardmode", value ? "1" : "0");
+    });
   }
 
   private animationFrameId: number | null = null;
