@@ -50,11 +50,11 @@ const Preview = memo(function Preview(props: { text: string }) {
       <div className={styles.visualization}>
         {rows.map((row, rowIndex) => (
           <>
-            {rowIndex % 4 === 0 && rowIndex * 2 + 1}
+            {rowIndex % 2 === 0 && rowIndex + 1}
             <div
               key={rowIndex}
               className={styles.row}
-              data-major={rowIndex % 4 === 0}
+              data-major={rowIndex % 2 === 0}
             >
               {row.map((isOn, dotIndex) => (
                 <div

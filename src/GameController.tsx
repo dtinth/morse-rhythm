@@ -1,10 +1,10 @@
 import { diffStringsRaw } from "jest-diff";
 import memoizeOne from "memoize-one";
-import { atom } from "nanostores";
+import { atom, type WritableAtom } from "nanostores";
 import { audioContext } from "./audioContext";
 import { GameAudio } from "./GameAudio";
 import type { LevelInfo } from "./LevelInfo";
-import { forgottenland } from "./levels";
+import { forgottenland, levels } from "./levels";
 import { reverseMorseDB } from "./morse";
 import { toVisualization } from "./toVisualization";
 import { UpdateTracker } from "./UpdateTracker";
@@ -13,21 +13,63 @@ interface GameTimer {
   time: number;
 }
 
+interface ScoreInfo {
+  scoreFraction: number;
+  common: number;
+  total: number;
+}
+
 export class GameController {
   $ready = atom(false);
   $started = atom(false);
+  $finished = atom(false);
   $pressed = atom(false);
   $time = atom(0);
   $frameCount = atom(0);
-  $hardMode = atom(false);
+  $hardMode = atom(localStorage.getItem("morse-rhythm-hardmode") === "1");
+  $iambic = atom(localStorage.getItem("morse-rhythm-iambic") === "1");
 
   songAudio: AudioBuffer | null = null;
   keyAudio: AudioBuffer | null = null;
   audio = new GameAudio();
   updateTracker = new UpdateTracker();
-  levelInfo: LevelInfo = forgottenland;
+
+  levelInfo: LevelInfo;
+  visualization: string[];
+  timing: GameTiming;
+  keypad: GameKeypad;
+  targetChars: string;
+  startTime: number;
+  endTime: number;
+  $score: WritableAtom<ScoreInfo>;
+
+  $autoDit = atom(false);
+  $autoDah = atom(false);
+
+  constructor(private levelName: string) {
+    this.levelInfo = levels.get(this.levelName) || forgottenland;
+    this.visualization = toVisualization(this.levelInfo.targetText);
+    this.timing = new GameTiming(this.levelInfo);
+    this.keypad = new GameKeypad(this.timer, this.timing);
+    this.targetChars = Array.from(this.levelInfo.targetText)
+      .filter((x) => x.match(/^[A-Z]$/))
+      .join("");
+    this.startTime = (() => {
+      const firstUnit = this.visualization.findIndex((x) => x);
+      return this.timing.unitsToSeconds(firstUnit);
+    })();
+    this.endTime = this.timing.unitsToSeconds(this.visualization.length);
+    this.$score = atom(this.getCurrentScore());
+
+    this.$iambic.listen((value) => {
+      localStorage.setItem("morse-rhythm-iambic", value ? "1" : "0");
+    });
+    this.$hardMode.listen((value) => {
+      localStorage.setItem("morse-rhythm-hardmode", value ? "1" : "0");
+    });
+  }
+
   private animationFrameId: number | null = null;
-  visualization = toVisualization(this.levelInfo.targetText);
   timer: GameTimer = (() => {
     const getTime = () => {
       if (this.audio.startedAt == null) return 0;
@@ -39,18 +81,9 @@ export class GameController {
       },
     };
   })();
-  timing = new GameTiming(this.levelInfo);
-  keypad = new GameKeypad(this.timer, this.timing);
-  targetChars = Array.from(this.levelInfo.targetText)
-    .filter((x) => x.match(/^[A-Z]$/))
-    .join("");
-  startTime = (() => {
-    const firstUnit = this.visualization.findIndex((x) => x);
-    return this.timing.unitsToSeconds(firstUnit);
-  })();
   get currentChars() {
     const out: string[] = [];
-    const endTime = this.timing.unitsToSeconds(this.visualization.length);
+    const endTime = this.endTime;
     for (const group of this.keypad.groups) {
       if (group.startedAt > endTime + 1) break;
       const interpretation = group.interpretation;
@@ -61,23 +94,24 @@ export class GameController {
     return out.join("");
   }
   private getCurrentScore = (() => {
-    const computeScore = memoizeOne((current: string, target: string) => {
-      const diff = diffStringsRaw(target, current, false);
-      let total = 0;
-      let common = 0;
-      for (const item of diff) {
-        if (item[0] === 0) {
-          total += item[1].length;
-          common += item[1].length;
-        } else {
-          total += item[1].length;
+    const computeScore = memoizeOne(
+      (current: string, target: string): ScoreInfo => {
+        const diff = diffStringsRaw(target, current, false);
+        let total = 0;
+        let common = 0;
+        for (const item of diff) {
+          if (item[0] === 0) {
+            total += item[1].length;
+            common += item[1].length;
+          } else {
+            total += item[1].length;
+          }
         }
+        return { scoreFraction: common / total, common, total };
       }
-      return { scoreFraction: common / total, common, total };
-    });
+    );
     return () => computeScore(this.currentChars, this.targetChars);
   })();
-  $score = atom(this.getCurrentScore());
 
   async init() {
     await this.loadSound();
@@ -107,6 +141,7 @@ export class GameController {
   }
   frame() {
     if (this.audio.startedAt === null) return;
+    this.executeAuto();
     const elapsed = audioContext.currentTime - this.audio.startedAt;
     const targetFrame = Math.floor(elapsed * 60);
     this.updateTracker.setTarget(targetFrame, () => {
@@ -115,6 +150,9 @@ export class GameController {
     this.$frameCount.set(this.$frameCount.get() + 1);
     this.$time.set(this.timer.time);
     this.$score.set(this.getCurrentScore());
+    if (this.timer.time >= this.endTime + 1 && !this.$finished.get()) {
+      this.$finished.set(true);
+    }
     this.animationFrameId = requestAnimationFrame(this.frame.bind(this));
   }
   update() {
@@ -140,6 +178,76 @@ export class GameController {
       this.animationFrameId = null;
     }
     this.audio.dispose();
+  }
+  auto(signal: "." | "-", pressed: boolean) {
+    if (signal === ".") {
+      this.$autoDit.set(pressed);
+    } else {
+      this.$autoDah.set(pressed);
+    }
+  }
+  autoKeyer = new AutoKeyer(
+    () => this.up(),
+    () => this.down()
+  );
+  executeAuto() {
+    this.autoKeyer.execute(
+      this.$autoDit.get(),
+      this.$autoDah.get(),
+      this.timing.secondsToUnits(this.timer.time)
+    );
+  }
+}
+
+class AutoKeyer {
+  active: {
+    nextEvalUnit: number;
+    queue: boolean[];
+    latest: boolean;
+    lastAction: "dit" | "dah";
+  } | null = null;
+
+  constructor(private up: () => void, private down: () => void) {}
+  execute(autoDit: boolean, autoDah: boolean, unit: number) {
+    if (!this.active && (autoDah || autoDit)) {
+      this.active = {
+        nextEvalUnit: unit,
+        queue: [],
+        latest: false,
+        lastAction: autoDah ? "dah" : "dit",
+      };
+    }
+    if (this.active && unit >= this.active.nextEvalUnit) {
+      if (this.active.queue.length === 0) {
+        if (autoDah && autoDit) {
+          if (this.active.lastAction === "dit") {
+            autoDit = false;
+          } else {
+            autoDah = false;
+          }
+        }
+        if (autoDah) {
+          this.active.queue.push(true, true, true, false);
+          this.active.lastAction = "dah";
+        } else if (autoDit) {
+          this.active.queue.push(true, false);
+          this.active.lastAction = "dit";
+        } else {
+          this.active = null;
+          return;
+        }
+      }
+      const next = this.active.queue.shift()!;
+      if (next !== this.active.latest) {
+        if (next) {
+          this.down();
+        } else {
+          this.up();
+        }
+        this.active.latest = next;
+      }
+      this.active.nextEvalUnit += 1;
+    }
   }
 }
 

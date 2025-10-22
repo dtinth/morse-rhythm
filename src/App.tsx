@@ -10,7 +10,7 @@ function App() {
           A rhythm game PoC inspired by morse code
         </p>
         <div className={styles.buttons}>
-          <Link to="/game" className={styles.playButton}>
+          <Link to="/levels" className={styles.playButton}>
             Play
           </Link>
         </div>
