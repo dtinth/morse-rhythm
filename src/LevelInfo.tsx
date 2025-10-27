@@ -6,7 +6,8 @@ export interface LevelInfo {
   licenseInfo: string;
   attributionUrl: string;
   additionalCredits: string;
-  targetText: string;
+  targetText: string | (() => string);
   songUrl: string;
   keyUrl: string;
+  durationMins: number;
 }

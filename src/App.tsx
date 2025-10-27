@@ -18,6 +18,15 @@ function App() {
           built by dtinth
           <br />
           submitted to Unpolished Jam #4
+          <br />
+          <br />
+          <a
+            href="https://github.com/dtinth/morse-rhythm"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            v1.2
+          </a>
         </p>
       </div>
     </div>

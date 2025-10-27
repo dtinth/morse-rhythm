@@ -5,6 +5,7 @@ import { Link, useSearchParams } from "react-router";
 import styles from "./Game.module.css";
 import { GameController } from "./GameController";
 import { GameDisplay } from "./GameDisplay";
+import { KeyboardHandler } from "./KeyboardHandler";
 
 export function Game() {
   const [params] = useSearchParams();
@@ -32,33 +33,57 @@ export function GameMain({ level }: { level: string }) {
   useEffect(() => {
     if (!started) return;
 
+    const handler = new KeyboardHandler(controller);
+
+    const tapKeys = new Set<string>([
+      "Space",
+      "Enter",
+      "Minus",
+      "Equal",
+      "BracketLeft",
+      "BracketRight",
+      "Semicolon",
+      "Quote",
+      "Comma",
+    ]);
+    function isTap(code: string) {
+      if (tapKeys.has(code)) return true;
+      if (code.startsWith("Key")) return true;
+      if (code.startsWith("Digit")) return true;
+      return false;
+    }
+    function isDit(code: string) {
+      return code === "ArrowLeft" || code === "KeyZ" || code === "Period";
+    }
+    function isDah(code: string) {
+      return code === "ArrowRight" || code === "KeyX" || code === "Slash";
+    }
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === "Space" && !e.repeat) {
-        e.preventDefault();
-        controller.down();
-      }
-      if (e.code === "ArrowLeft" && !e.repeat) {
+      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      if (isDit(e.code)) {
         e.preventDefault();
         controller.auto(".", true);
-      }
-      if (e.code === "ArrowRight" && !e.repeat) {
+      } else if (isDah(e.code)) {
         e.preventDefault();
         controller.auto("-", true);
+      } else if (isTap(e.code)) {
+        e.preventDefault();
+        handler.down(e.code);
       }
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.code === "Space") {
-        e.preventDefault();
-        controller.up();
-      }
-      if (e.code === "ArrowLeft") {
+      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      if (isDit(e.code)) {
         e.preventDefault();
         controller.auto(".", false);
-      }
-      if (e.code === "ArrowRight") {
+      } else if (isDah(e.code)) {
         e.preventDefault();
         controller.auto("-", false);
+      } else if (isTap(e.code)) {
+        e.preventDefault();
+        handler.up(e.code);
       }
     };
 
@@ -105,7 +130,10 @@ function GameView(props: { controller: GameController }) {
         </div>
         <div className={styles.metadata}>
           <h1>{info.songName}</h1>
-          <p className={styles.artist}>by {info.artist}</p>
+          <p className={styles.artist}>
+            {info.artist.startsWith("traditional,") ? "" : "by "}
+            {info.artist}
+          </p>
           <p>
             {info.licenseInfo}
             <br />
