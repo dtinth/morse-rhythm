@@ -1,10 +1,34 @@
+import { english1k48units } from "./english1k48units";
+import { english1k96units } from "./english1k96units";
 import type { LevelInfo } from "./LevelInfo";
+
+export const abc: LevelInfo = {
+  bpm: 168,
+  songName: "ABC (morse code ver.)",
+  artist: "traditional, arranged by dtinth",
+  description: "A short song to introduce the alphabet in morse code",
+  durationMins: 1,
+  licenseInfo:
+    "Licensed under Creative Commons Attribution Noncommercial (3.0)",
+  attributionUrl: "",
+  additionalCredits: "level design and key sound by dtinth",
+  songUrl: "songs/abc/song2.ogg",
+  keyUrl: "songs/abc/key2.ogg",
+  targetText: `________________________________
+A----B--C-D---E------F--G_____
+H---I-----JK--L--M---N----O-
+P---------
+QR---S------------T-----U---V_____
+W_____X____-Y____Z`,
+};
 
 export const forgottenland: LevelInfo = {
   bpm: 136,
   songName: "forgottenland",
   artist: "airtone",
-  description: "A slow dreamy song to introduce you to the game",
+  description:
+    "A slow, dreamy song to introduce you to the game's mechanic. Practice long sentences and pangrams.",
+  durationMins: 4,
   licenseInfo:
     "Licensed under Creative Commons Attribution Noncommercial (3.0)",
   attributionUrl: "https://ccmixter.org/files/airtone/61959",
@@ -30,7 +54,9 @@ export const intergalacticBliss: LevelInfo = {
   bpm: 256,
   songName: "Intergalactic Bliss (Trance Mix)",
   artist: "KCentric",
-  description: "A fast-paced trance song to help you practice the alphabet",
+  description:
+    "A fast-paced trance song along with an alphabet drill. Practice each letter 8 times and common two-letter words",
+  durationMins: 5,
   licenseInfo:
     "Licensed under Creative Commons Attribution Noncommercial (3.0)",
   attributionUrl: "https://ccmixter.org/files/kcentric/48165",
@@ -83,7 +109,66 @@ OK_-END__-FIN_-BYE
 `,
 };
 
+class WordQueue {
+  private queue: string[];
+  private nextIndex: number = 0;
+  constructor(words: string[]) {
+    this.queue = [...words];
+    const score = new Map<string, number>(words.map((w) => [w, Math.random()]));
+    this.queue.sort((a, b) => (score.get(b) || 0) - (score.get(a) || 0));
+  }
+  randomWords(n: number) {
+    const result = Array.from(
+      { length: n },
+      () => this.queue[this.nextIndex++ % this.queue.length]
+    );
+    return result.join("\n");
+  }
+}
+
+export const ophelia: LevelInfo = {
+  bpm: 270,
+  songName: "Ophelia's Song (remix)",
+  artist: "musetta remixed by pharmacopia",
+  description:
+    "Transmit a random selection of common English words. Each playthrough is different. (Iambic mode highly recommended)",
+  durationMins: 4,
+  licenseInfo: "Licensed under Creative Commons Attribution (2.5)",
+  attributionUrl: "https://ccmixter.org/files/pharmacopia/6517",
+  additionalCredits: "level design and key sound by dtinth",
+  songUrl: "songs/ophelia/song2.ogg",
+  keyUrl: "songs/ophelia/key3.ogg",
+  targetText: () => {
+    const shortWords = new WordQueue(english1k48units);
+    const longWords = new WordQueue(english1k96units);
+    return `
+____ ____ ____  ____ ____ ____  ____ ____ ____  ____ ____ ____
+
+${shortWords.randomWords(17)}
+
+${shortWords.randomWords(1)} ____ ____ ____
+${shortWords.randomWords(1)} ____ ____ ____
+${shortWords.randomWords(1)} ____ ____ ____
+${shortWords.randomWords(1)} ____ ____ ____
+
+${shortWords.randomWords(16)}
+____ ____ ____  ____ ____ ____  ____ ____ ____  ____ ____ ____
+${shortWords.randomWords(1)} ____ ____ ____
+${shortWords.randomWords(1)} ____ ____ ____
+${shortWords.randomWords(1)} ____ ____ ____
+${shortWords.randomWords(1)} ____ ____ ____
+
+${longWords.randomWords(4)}
+
+${shortWords.randomWords(21)}
+${longWords.randomWords(6)}
+`;
+  },
+};
+
 export const levels = new Map<string, LevelInfo>([
+  ["abc", abc],
   ["forgottenland", forgottenland],
   ["intergalactic_bliss", intergalacticBliss],
+  ["ophelia", ophelia],
 ]);

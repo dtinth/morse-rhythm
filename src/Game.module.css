@@ -22,14 +22,14 @@
 
 .levelInfo h1 {
   margin: 0;
-  font-size: 32px;
-  color: #e3e3d7;
+  font-size: 1.25rem;
+  color: #d7eb9b;
 }
 
 .artist {
   margin: 0;
-  font-size: 20px;
-  color: #d7eb9b;
+  font-size: 1rem;
+  color: #b3b3a7;
   font-weight: 500;
 }
 
@@ -41,6 +41,10 @@
 
 .metadata p {
   margin: 8px 0;
+}
+
+.metadata h1 + p {
+  margin: 0.125rem;
 }
 
 .metadata a {

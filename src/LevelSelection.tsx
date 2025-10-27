@@ -30,12 +30,32 @@ export function LevelSelection() {
               className={styles.levelCard}
             >
               <h2 className={styles.levelName}>{levelInfo.songName}</h2>
-              <p className={styles.levelArtist}>by {levelInfo.artist}</p>
+              <p className={styles.levelArtist}>
+                {levelInfo.artist.startsWith("traditional,") ? "" : "by "}
+                {levelInfo.artist}
+              </p>
               <p className={styles.levelDescription}>{levelInfo.description}</p>
+              <p className={styles.levelMeta}>
+                duration: {formatDuration(levelInfo.durationMins)} &nbsp; ·
+                &nbsp; {formatSpeed(levelInfo.bpm)}
+              </p>
             </Link>
           ))}
         </div>
       </div>
     </div>
   );
+}
+
+function formatDuration(mins: number) {
+  return `${mins} min${mins !== 1 ? "s" : ""}`;
+}
+
+function formatSpeed(bpm: number) {
+  // 1 unit (dit duration) is an 16th note.
+  const sixteenthNoteDuration = 60 / bpm / 4;
+
+  // Convert to WPM (words per minute) using standard PARIS method.
+  const wpm = Math.round(1.2 / sixteenthNoteDuration);
+  return `${wpm} WPM`;
 }

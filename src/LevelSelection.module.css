@@ -64,6 +64,12 @@
   color: #8a8a7f;
 }
 
+.levelMeta {
+  margin: 0.5rem 0 0;
+  font-size: 0.75rem;
+  color: #8a8a7f;
+}
+
 .backLink {
   color: #d7eb9b;
   text-decoration: none;

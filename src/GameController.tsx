@@ -34,6 +34,7 @@ export class GameController {
   audio = new GameAudio();
   updateTracker = new UpdateTracker();
 
+  targetText: string;
   levelInfo: LevelInfo;
   visualization: string[];
   timing: GameTiming;
@@ -48,10 +49,14 @@ export class GameController {
 
   constructor(private levelName: string) {
     this.levelInfo = levels.get(this.levelName) || forgottenland;
-    this.visualization = toVisualization(this.levelInfo.targetText);
+    this.targetText =
+      typeof this.levelInfo.targetText === "function"
+        ? this.levelInfo.targetText()
+        : this.levelInfo.targetText;
+    this.visualization = toVisualization(this.targetText);
     this.timing = new GameTiming(this.levelInfo);
     this.keypad = new GameKeypad(this.timer, this.timing);
-    this.targetChars = Array.from(this.levelInfo.targetText)
+    this.targetChars = Array.from(this.targetText)
       .filter((x) => x.match(/^[A-Z]$/))
       .join("");
     this.startTime = (() => {
