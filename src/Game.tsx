@@ -64,14 +64,17 @@ export function GameMain({ level, onReplay, onExit }: { level: string; onReplay:
       return false;
     }
     function isDit(code: string) {
-      return code === "ArrowLeft" || code === "KeyZ" || code === "Period";
+      return code === "ArrowLeft" || code === "KeyZ" || code === "Period" || code === "ControlLeft";
     }
     function isDah(code: string) {
-      return code === "ArrowRight" || code === "KeyX" || code === "Slash";
+      return code === "ArrowRight" || code === "KeyX" || code === "Slash" || code === "ControlRight";
     }
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      // Allow Control keys for dit/dah, but skip other modifier combinations
+      if (e.altKey || e.metaKey || e.shiftKey) return;
+      if (!isDit(e.code) && !isDah(e.code) && e.ctrlKey) return;
+
       if (isDit(e.code)) {
         e.preventDefault();
         controller.auto(".", true);
@@ -85,7 +88,10 @@ export function GameMain({ level, onReplay, onExit }: { level: string; onReplay:
     };
 
     const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      // Allow Control keys for dit/dah, but skip other modifier combinations
+      if (e.altKey || e.metaKey || e.shiftKey) return;
+      if (!isDit(e.code) && !isDah(e.code) && e.ctrlKey) return;
+
       if (isDit(e.code)) {
         e.preventDefault();
         controller.auto(".", false);
@@ -239,6 +245,8 @@ function GameView(props: { controller: GameController; onReplay: () => void; onE
               $isPressed={controller.$autoDit}
               onDown={() => controller.auto(".", true)}
               onUp={() => controller.auto(".", false)}
+              onRightDown={() => controller.auto("-", true)}
+              onRightUp={() => controller.auto("-", false)}
               text="·"
               secondary
             />
@@ -246,6 +254,8 @@ function GameView(props: { controller: GameController; onReplay: () => void; onE
               $isPressed={controller.$autoDah}
               onDown={() => controller.auto("-", true)}
               onUp={() => controller.auto("-", false)}
+              onRightDown={() => controller.auto(".", true)}
+              onRightUp={() => controller.auto(".", false)}
               text="—"
               secondary
             />
@@ -334,20 +344,54 @@ function GameButton(props: {
   onUp: () => void;
   text: string;
   secondary?: boolean;
+  onRightDown?: () => void;
+  onRightUp?: () => void;
 }) {
-  const { $isPressed, onDown, onUp } = props;
+  const { $isPressed, onDown, onUp, onRightDown, onRightUp } = props;
   const isPressed = useStore($isPressed);
 
-  const handleDown = useCallback(
-    (e: ButtonEvent) => {
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      if (e.button === 2 && onRightDown) {
+        onRightDown();
+      } else if (e.button === 0) {
+        onDown();
+      }
+    },
+    [onDown, onRightDown]
+  );
+
+  const handleMouseUp = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      if (e.button === 2 && onRightUp) {
+        onRightUp();
+      } else if (e.button === 0) {
+        onUp();
+      }
+    },
+    [onUp, onRightUp]
+  );
+
+  const handleMouseLeave = useCallback(
+    () => {
+      onUp();
+      if (onRightUp) onRightUp();
+    },
+    [onUp, onRightUp]
+  );
+
+  const handleTouchDown = useCallback(
+    (e: React.TouchEvent) => {
       e.preventDefault();
       onDown();
     },
     [onDown]
   );
 
-  const handleUp = useCallback(
-    (e: ButtonEvent) => {
+  const handleTouchUp = useCallback(
+    (e: React.TouchEvent) => {
       e.preventDefault();
       onUp();
     },
@@ -355,6 +399,10 @@ function GameButton(props: {
   );
 
   const handleMove = useCallback((e: React.TouchEvent) => {
+    e.preventDefault();
+  }, []);
+
+  const handleContextMenu = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
   }, []);
 
@@ -376,12 +424,13 @@ function GameButton(props: {
         isPressed ? styles.pressed : "",
         props.secondary ? styles.secondary : "",
       ].join(" ")}
-      onMouseDown={handleDown}
-      onMouseUp={handleUp}
-      onMouseLeave={handleUp}
-      onTouchStart={handleDown}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseLeave}
+      onTouchStart={handleTouchDown}
       onTouchMove={handleMove}
-      onTouchEnd={handleUp}
+      onTouchEnd={handleTouchUp}
+      onContextMenu={handleContextMenu}
       ref={btnRef}
     >
       {props.text}
