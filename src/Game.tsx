@@ -203,7 +203,45 @@ function GameView(props: { controller: GameController; onReplay: () => void; onE
   }
   return (
     <div>
-      <GameHeader controller={controller} onReplay={onReplay} onExit={onExit} />
+      <div
+        style={{
+          display: "flex",
+          gap: "8px",
+          padding: "8px 4px",
+        }}
+      >
+        <button
+          onClick={onExit}
+          style={{
+            background: "transparent",
+            border: "1px solid #e3e3d7",
+            color: "#e3e3d7",
+            padding: "2px 6px",
+            fontSize: 11,
+            cursor: "pointer",
+            borderRadius: "2px",
+          }}
+          title="Exit to song selection"
+        >
+          Exit
+        </button>
+        <button
+          onClick={onReplay}
+          style={{
+            background: "transparent",
+            border: "1px solid #e3e3d7",
+            color: "#e3e3d7",
+            padding: "2px 6px",
+            fontSize: 11,
+            cursor: "pointer",
+            borderRadius: "2px",
+          }}
+          title="Replay this song"
+        >
+          Replay
+        </button>
+      </div>
+      <GameHeader controller={controller} />
       <div style={{ position: "relative" }}>
         <GameDisplay controller={controller} />
         <GameHint controller={controller} />
@@ -240,8 +278,8 @@ function GameView(props: { controller: GameController; onReplay: () => void; onE
   );
 }
 
-function GameHeader(props: { controller: GameController; onReplay: () => void; onExit: () => void }) {
-  const { controller, onReplay, onExit } = props;
+function GameHeader(props: { controller: GameController }) {
+  const { controller } = props;
   const score = useStore(controller.$score);
   const finished = useStore(controller.$finished);
   return (
@@ -252,40 +290,8 @@ function GameHeader(props: { controller: GameController; onReplay: () => void; o
         padding: "3px 4px",
         fontSize: 12,
         textAlign: "left",
-        gap: "8px",
-        alignItems: "center",
       }}
     >
-      <button
-        onClick={onExit}
-        style={{
-          background: "transparent",
-          border: "1px solid #e3e3d7",
-          color: "#e3e3d7",
-          padding: "2px 6px",
-          fontSize: 11,
-          cursor: "pointer",
-          borderRadius: "2px",
-        }}
-        title="Exit to song selection"
-      >
-        Exit
-      </button>
-      <button
-        onClick={onReplay}
-        style={{
-          background: "transparent",
-          border: "1px solid #e3e3d7",
-          color: "#e3e3d7",
-          padding: "2px 6px",
-          fontSize: 11,
-          cursor: "pointer",
-          borderRadius: "2px",
-        }}
-        title="Replay this song"
-      >
-        Replay
-      </button>
       <div style={{ flex: "1", fontWeight: "bold" }}>
         {controller.levelInfo.songName}
       </div>
