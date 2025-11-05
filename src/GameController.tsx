@@ -9,6 +9,14 @@ import { reverseMorseDB } from "./morse";
 import { toVisualization } from "./toVisualization";
 import { UpdateTracker } from "./UpdateTracker";
 
+interface AudioBufferCache {
+  url: string;
+  audioBuffer: AudioBuffer;
+}
+
+let songCache: AudioBufferCache | null = null;
+let keyCache: AudioBufferCache | null = null;
+
 interface GameTimer {
   time: number;
 }
@@ -123,17 +131,26 @@ export class GameController {
   }
   async loadSound() {
     const [song, key] = await Promise.all([
-      this.loadAudioBuffer(this.levelInfo.songUrl),
-      this.loadAudioBuffer(this.levelInfo.keyUrl),
+      this.loadAudioBuffer(this.levelInfo.songUrl, songCache, (cache) => songCache = cache),
+      this.loadAudioBuffer(this.levelInfo.keyUrl, keyCache, (cache) => keyCache = cache),
     ]);
     this.songAudio = song;
     this.keyAudio = key;
     this.$ready.set(true);
   }
-  async loadAudioBuffer(url: string): Promise<AudioBuffer> {
+  async loadAudioBuffer(
+    url: string,
+    cache: AudioBufferCache | null,
+    setCache: (cache: AudioBufferCache) => void
+  ): Promise<AudioBuffer> {
+    if (cache && cache.url === url) {
+      return cache.audioBuffer;
+    }
     const res = await fetch(url);
     const arrayBuffer = await res.arrayBuffer();
-    return await audioContext.decodeAudioData(arrayBuffer);
+    const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+    setCache({ url, audioBuffer });
+    return audioBuffer;
   }
   start() {
     if (!this.songAudio || !this.keyAudio) {
