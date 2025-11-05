@@ -14,8 +14,8 @@ interface AudioBufferCache {
   audioBuffer: AudioBuffer;
 }
 
-let songCache: AudioBufferCache | null = null;
-let keyCache: AudioBufferCache | null = null;
+const songCache: { current: AudioBufferCache | null } = { current: null };
+const keyCache: { current: AudioBufferCache | null } = { current: null };
 
 interface GameTimer {
   time: number;
@@ -131,8 +131,8 @@ export class GameController {
   }
   async loadSound() {
     const [song, key] = await Promise.all([
-      this.loadAudioBuffer(this.levelInfo.songUrl, songCache, (cache) => songCache = cache),
-      this.loadAudioBuffer(this.levelInfo.keyUrl, keyCache, (cache) => keyCache = cache),
+      this.loadAudioBuffer(this.levelInfo.songUrl, songCache),
+      this.loadAudioBuffer(this.levelInfo.keyUrl, keyCache),
     ]);
     this.songAudio = song;
     this.keyAudio = key;
@@ -140,16 +140,15 @@ export class GameController {
   }
   async loadAudioBuffer(
     url: string,
-    cache: AudioBufferCache | null,
-    setCache: (cache: AudioBufferCache) => void
+    cache: { current: AudioBufferCache | null }
   ): Promise<AudioBuffer> {
-    if (cache && cache.url === url) {
-      return cache.audioBuffer;
+    if (cache.current && cache.current.url === url) {
+      return cache.current.audioBuffer;
     }
     const res = await fetch(url);
     const arrayBuffer = await res.arrayBuffer();
     const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-    setCache({ url, audioBuffer });
+    cache.current = { url, audioBuffer };
     return audioBuffer;
   }
   start() {
