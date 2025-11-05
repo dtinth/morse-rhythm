@@ -14,10 +14,15 @@
   - Matches the behavior of [morsecode.world keyer](https://morsecode.world/international/keyer.html)
 
 - **Right-click support for iambic buttons**
+
   - Dit button (·) sends dah (—) on right-click
   - Dah button (—) sends dit (·) on right-click
   - Enables flexible single-handed operation
   - Matches the behavior of [morsecode.world keyer](https://morsecode.world/international/keyer.html)
+
+- **Improved visual feedback in Hard Mode**
+
+  - In Hard Mode, the visualization now shows the starting point of each Morse code signal
 
 ## v1.2
 
