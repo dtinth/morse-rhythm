@@ -43,7 +43,11 @@ export function GameDisplay(props: { controller: GameController }) {
         for (let i = begin; i <= end; i++) {
           const x = i * unitWidth;
           if (visualization[i]) {
-            if (!hardMode) {
+            if (hardMode) {
+              if (visualization[i] !== " ") {
+                ctx.fillRect(x, h - 11, 1, unitWidth + 1);
+              }
+            } else {
               if (i === ~~currentUnit) {
                 ctx.fillStyle = "#fff";
                 ctx.fillRect(x, h - 11, unitWidth + 1, unitWidth + 1);
