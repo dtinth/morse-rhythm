@@ -203,39 +203,17 @@ function GameView(props: { controller: GameController; onReplay: () => void; onE
   }
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          gap: "8px",
-          padding: "8px 4px",
-        }}
-      >
+      <div className={styles.navButtonContainer}>
         <button
           onClick={onExit}
-          style={{
-            background: "transparent",
-            border: "1px solid #e3e3d7",
-            color: "#e3e3d7",
-            padding: "2px 6px",
-            fontSize: 11,
-            cursor: "pointer",
-            borderRadius: "2px",
-          }}
+          className={styles.navButton}
           title="Exit to song selection"
         >
           Exit
         </button>
         <button
           onClick={onReplay}
-          style={{
-            background: "transparent",
-            border: "1px solid #e3e3d7",
-            color: "#e3e3d7",
-            padding: "2px 6px",
-            fontSize: 11,
-            cursor: "pointer",
-            borderRadius: "2px",
-          }}
+          className={styles.navButton}
           title="Replay this song"
         >
           Replay
