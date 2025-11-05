@@ -1,7 +1,7 @@
 import { useStore } from "@nanostores/react";
 import type { ReadableAtom } from "nanostores";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useSearchParams } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import styles from "./Game.module.css";
 import { GameController } from "./GameController";
 import { GameDisplay } from "./GameDisplay";
@@ -10,10 +10,21 @@ import { KeyboardHandler } from "./KeyboardHandler";
 export function Game() {
   const [params] = useSearchParams();
   const level = params.get("level") || "forgottenland";
-  return <GameMain level={level} key={level} />;
+  const [gameKey, setGameKey] = useState(0);
+  const navigate = useNavigate();
+
+  const handleReplay = useCallback(() => {
+    setGameKey(prev => prev + 1);
+  }, []);
+
+  const handleExit = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
+
+  return <GameMain level={level} key={`${level}-${gameKey}`} onReplay={handleReplay} onExit={handleExit} />;
 }
 
-export function GameMain({ level }: { level: string }) {
+export function GameMain({ level, onReplay, onExit }: { level: string; onReplay: () => void; onExit: () => void }) {
   const [controller] = useState(() => new GameController(level));
   useEffect(() => {
     let initialized = false;
@@ -96,13 +107,13 @@ export function GameMain({ level }: { level: string }) {
     };
   }, [controller, started]);
 
-  return <GameView controller={controller} />;
+  return <GameView controller={controller} onReplay={onReplay} onExit={onExit} />;
 }
 
 type ButtonEvent = Pick<React.UIEvent, "preventDefault">;
 
-function GameView(props: { controller: GameController }) {
-  const { controller } = props;
+function GameView(props: { controller: GameController; onReplay: () => void; onExit: () => void }) {
+  const { controller, onReplay, onExit } = props;
   const ready = useStore(controller.$ready);
   const started = useStore(controller.$started);
   const hardMode = useStore(controller.$hardMode);
@@ -192,7 +203,7 @@ function GameView(props: { controller: GameController }) {
   }
   return (
     <div>
-      <GameHeader controller={controller} />
+      <GameHeader controller={controller} onReplay={onReplay} onExit={onExit} />
       <div style={{ position: "relative" }}>
         <GameDisplay controller={controller} />
         <GameHint controller={controller} />
@@ -229,8 +240,8 @@ function GameView(props: { controller: GameController }) {
   );
 }
 
-function GameHeader(props: { controller: GameController }) {
-  const { controller } = props;
+function GameHeader(props: { controller: GameController; onReplay: () => void; onExit: () => void }) {
+  const { controller, onReplay, onExit } = props;
   const score = useStore(controller.$score);
   const finished = useStore(controller.$finished);
   return (
@@ -241,8 +252,40 @@ function GameHeader(props: { controller: GameController }) {
         padding: "3px 4px",
         fontSize: 12,
         textAlign: "left",
+        gap: "8px",
+        alignItems: "center",
       }}
     >
+      <button
+        onClick={onExit}
+        style={{
+          background: "transparent",
+          border: "1px solid #e3e3d7",
+          color: "#e3e3d7",
+          padding: "2px 6px",
+          fontSize: 11,
+          cursor: "pointer",
+          borderRadius: "2px",
+        }}
+        title="Exit to song selection"
+      >
+        Exit
+      </button>
+      <button
+        onClick={onReplay}
+        style={{
+          background: "transparent",
+          border: "1px solid #e3e3d7",
+          color: "#e3e3d7",
+          padding: "2px 6px",
+          fontSize: 11,
+          cursor: "pointer",
+          borderRadius: "2px",
+        }}
+        title="Replay this song"
+      >
+        Replay
+      </button>
       <div style={{ flex: "1", fontWeight: "bold" }}>
         {controller.levelInfo.songName}
       </div>
