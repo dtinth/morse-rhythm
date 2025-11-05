@@ -14,17 +14,32 @@ export function Game() {
   const navigate = useNavigate();
 
   const handleReplay = useCallback(() => {
-    setGameKey(prev => prev + 1);
+    setGameKey((prev) => prev + 1);
   }, []);
 
   const handleExit = useCallback(() => {
     navigate(-1);
   }, [navigate]);
 
-  return <GameMain level={level} key={`${level}-${gameKey}`} onReplay={handleReplay} onExit={handleExit} />;
+  return (
+    <GameMain
+      level={level}
+      key={`${level}-${gameKey}`}
+      onReplay={handleReplay}
+      onExit={handleExit}
+    />
+  );
 }
 
-export function GameMain({ level, onReplay, onExit }: { level: string; onReplay: () => void; onExit: () => void }) {
+export function GameMain({
+  level,
+  onReplay,
+  onExit,
+}: {
+  level: string;
+  onReplay: () => void;
+  onExit: () => void;
+}) {
   const [controller] = useState(() => new GameController(level));
   useEffect(() => {
     let initialized = false;
@@ -64,10 +79,20 @@ export function GameMain({ level, onReplay, onExit }: { level: string; onReplay:
       return false;
     }
     function isDit(code: string) {
-      return code === "ArrowLeft" || code === "KeyZ" || code === "Period" || code === "ControlLeft";
+      return (
+        code === "ArrowLeft" ||
+        code === "KeyZ" ||
+        code === "Period" ||
+        code === "ControlLeft"
+      );
     }
     function isDah(code: string) {
-      return code === "ArrowRight" || code === "KeyX" || code === "Slash" || code === "ControlRight";
+      return (
+        code === "ArrowRight" ||
+        code === "KeyX" ||
+        code === "Slash" ||
+        code === "ControlRight"
+      );
     }
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -113,12 +138,16 @@ export function GameMain({ level, onReplay, onExit }: { level: string; onReplay:
     };
   }, [controller, started]);
 
-  return <GameView controller={controller} onReplay={onReplay} onExit={onExit} />;
+  return (
+    <GameView controller={controller} onReplay={onReplay} onExit={onExit} />
+  );
 }
 
-type ButtonEvent = Pick<React.UIEvent, "preventDefault">;
-
-function GameView(props: { controller: GameController; onReplay: () => void; onExit: () => void }) {
+function GameView(props: {
+  controller: GameController;
+  onReplay: () => void;
+  onExit: () => void;
+}) {
   const { controller, onReplay, onExit } = props;
   const ready = useStore(controller.$ready);
   const started = useStore(controller.$started);
@@ -374,13 +403,10 @@ function GameButton(props: {
     [onUp, onRightUp]
   );
 
-  const handleMouseLeave = useCallback(
-    () => {
-      onUp();
-      if (onRightUp) onRightUp();
-    },
-    [onUp, onRightUp]
-  );
+  const handleMouseLeave = useCallback(() => {
+    onUp();
+    if (onRightUp) onRightUp();
+  }, [onUp, onRightUp]);
 
   const handleTouchDown = useCallback(
     (e: React.TouchEvent) => {
