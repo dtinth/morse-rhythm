@@ -25,7 +25,7 @@ function App() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            v1.2
+            v1.3
           </a>
         </p>
       </div>
